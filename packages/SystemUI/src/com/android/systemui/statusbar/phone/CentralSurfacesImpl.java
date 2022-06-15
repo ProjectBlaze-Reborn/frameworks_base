@@ -69,6 +69,7 @@ import android.os.SystemProperties;
 import android.os.Trace;
 import android.os.UserHandle;
 import android.provider.Settings;
+import android.database.ContentObserver;
 import android.service.dreams.IDreamManager;
 import android.service.notification.StatusBarNotification;
 import android.util.ArraySet;
@@ -285,6 +286,9 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
 
     private static final String PULSE_ON_NEW_TRACKS =
             Settings.Secure.PULSE_ON_NEW_TRACKS;
+
+    private static final String QS_TRANSPARENCY =
+            "system:" + Settings.System.QS_TRANSPARENCY;
 
     private static final int MSG_LAUNCH_TRANSITION_TIMEOUT = 1003;
     // 1020-1040 reserved for BaseStatusBar
@@ -930,6 +934,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
         createAndAddWindows(result);
 
         mTunerService.addTunable(this, PULSE_ON_NEW_TRACKS);
+        mTunerService.addTunable(this, QS_TRANSPARENCY);
 
         // Set up the initial notification state. This needs to happen before CommandQueue.disable()
         setUpPresenter();
@@ -2912,6 +2917,10 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces,
                 KeyguardSliceProvider sliceProvider = KeyguardSliceProvider.getAttachedInstance();
                 if (sliceProvider != null)
                     sliceProvider.setPulseOnNewTracks(showPulseOnNewTracks);
+                break;
+            case QS_TRANSPARENCY:
+                mScrimController.setCustomScrimAlpha(
+                        TunerService.parseInteger(newValue, 100));
                 break;
             default:
                 break;
